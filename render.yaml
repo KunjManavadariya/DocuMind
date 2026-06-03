@@ -1,0 +1,142 @@
+services:
+  - type: web
+    name: documind-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    dockerCommand: sh -c "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-10000}"
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      - key: APP_ENV
+        value: render-free
+      - key: CORS_ORIGINS
+        value: https://documind-web.onrender.com,http://localhost:5173,http://127.0.0.1:5173
+      - key: INSTALL_ML_DEPS
+        value: "false"
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: CELERY_BROKER_URL
+        sync: false
+      - key: CELERY_RESULT_BACKEND
+        sync: false
+      - key: CACHE_ENABLED
+        value: "true"
+      - key: EMBEDDING_CACHE_TTL_SECONDS
+        value: "86400"
+      - key: ANSWER_CACHE_TTL_SECONDS
+        value: "600"
+      - key: DOCUMENT_STORAGE_PROVIDER
+        value: r2
+      - key: CLOUDFLARE_R2_ENDPOINT_URL
+        sync: false
+      - key: CLOUDFLARE_R2_ACCESS_KEY_ID
+        sync: false
+      - key: CLOUDFLARE_R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: CLOUDFLARE_R2_BUCKET
+        sync: false
+      - key: GENERATION_PROVIDER
+        value: gemini
+      - key: EMBEDDING_PROVIDER
+        value: gemini
+      - key: EVALUATION_PROVIDER
+        value: local
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_GENERATION_MODEL
+        value: gemini-2.5-flash-lite
+      - key: GEMINI_EMBEDDING_MODEL
+        value: gemini-embedding-001
+      - key: GEMINI_TEMPERATURE
+        value: "0.2"
+      - key: EMBEDDING_DIMENSION
+        value: "384"
+      - key: RERANKER_PROVIDER
+        value: local
+      - key: RERANKER_CANDIDATE_MULTIPLIER
+        value: "4"
+      - key: RERANKER_MODEL
+        value: cross-encoder/ms-marco-MiniLM-L-6-v2
+      - key: RAGAS_LLM_MODEL
+        value: gemini-2.0-flash
+      - key: RAGAS_EMBEDDING_MODEL
+        value: gemini-embedding-001
+
+  - type: web
+    name: documind-web
+    runtime: static
+    plan: free
+    buildCommand: cd frontend && npm ci && npm run build
+    staticPublishPath: ./frontend/dist
+    autoDeployTrigger: commit
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://documind-api.onrender.com
+
+  - type: worker
+    name: documind-worker
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    dockerCommand: celery -A app.worker.celery_app worker --loglevel=info
+    autoDeployTrigger: commit
+    envVars:
+      - key: APP_ENV
+        value: render-free
+      - key: INSTALL_ML_DEPS
+        value: "false"
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: CELERY_BROKER_URL
+        sync: false
+      - key: CELERY_RESULT_BACKEND
+        sync: false
+      - key: CACHE_ENABLED
+        value: "true"
+      - key: EMBEDDING_CACHE_TTL_SECONDS
+        value: "86400"
+      - key: ANSWER_CACHE_TTL_SECONDS
+        value: "600"
+      - key: DOCUMENT_STORAGE_PROVIDER
+        value: r2
+      - key: CLOUDFLARE_R2_ENDPOINT_URL
+        sync: false
+      - key: CLOUDFLARE_R2_ACCESS_KEY_ID
+        sync: false
+      - key: CLOUDFLARE_R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: CLOUDFLARE_R2_BUCKET
+        sync: false
+      - key: GENERATION_PROVIDER
+        value: gemini
+      - key: EMBEDDING_PROVIDER
+        value: gemini
+      - key: EVALUATION_PROVIDER
+        value: local
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_GENERATION_MODEL
+        value: gemini-2.5-flash-lite
+      - key: GEMINI_EMBEDDING_MODEL
+        value: gemini-embedding-001
+      - key: GEMINI_TEMPERATURE
+        value: "0.2"
+      - key: EMBEDDING_DIMENSION
+        value: "384"
+      - key: RERANKER_PROVIDER
+        value: local
+      - key: RERANKER_CANDIDATE_MULTIPLIER
+        value: "4"
+      - key: RERANKER_MODEL
+        value: cross-encoder/ms-marco-MiniLM-L-6-v2
+      - key: RAGAS_LLM_MODEL
+        value: gemini-2.0-flash
+      - key: RAGAS_EMBEDDING_MODEL
+        value: gemini-embedding-001

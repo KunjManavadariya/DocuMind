@@ -1,0 +1,20 @@
+[
+  {
+    "id": "documind-architecture-cache",
+    "question": "What does DocuMind use Redis for?",
+    "expected_terms": ["redis", "cache"],
+    "expected_answer": "DocuMind uses Redis for caching repeated answers and embeddings."
+  },
+  {
+    "id": "documind-architecture-async",
+    "question": "How does DocuMind process ingestion in the background?",
+    "expected_terms": ["celery", "ingestion"],
+    "expected_answer": "DocuMind processes ingestion jobs in the background with Celery."
+  },
+  {
+    "id": "documind-architecture-vectors",
+    "question": "Where are embeddings stored for similarity search?",
+    "expected_terms": ["pgvector", "embeddings"],
+    "expected_answer": "Embeddings are stored in Postgres with pgvector for similarity search."
+  }
+]

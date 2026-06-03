@@ -1,0 +1,27 @@
+name: Deploy EC2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -euo pipefail
+            cd ${{ secrets.EC2_APP_DIR }}
+            git fetch origin main
+            git reset --hard origin/main
+            docker compose -f docker-compose.prod.yml build
+            docker compose -f docker-compose.prod.yml up -d
+            curl -fsS http://localhost/api/health
+            curl -fsS http://localhost/api/release/readiness | python3 -c 'import json,sys; body=json.load(sys.stdin); print(body); raise SystemExit(0 if body.get("deployable") is True else 1)'

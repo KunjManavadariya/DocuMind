@@ -1,0 +1,2 @@
+"""DocuMind backend package."""
+
