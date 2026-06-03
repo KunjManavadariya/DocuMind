@@ -1,6 +1,8 @@
 # Local Managed Runbook
 
-Use this as the primary DocuMind demo path.
+This is the primary operating guide for DocuMind. It explains how to start, verify, use, stop, and debug the local-managed runtime.
+
+## Runtime Model
 
 Nothing is deployed to a public host. Your laptop runs:
 
@@ -11,11 +13,13 @@ Nothing is deployed to a public host. Your laptop runs:
 Managed services provide real backing systems:
 
 - Neon Postgres with pgvector
-- Upstash Redis for cache, Celery broker, and result backend
-- Cloudflare R2 for source document storage
-- Gemini for generation and embeddings
+- Upstash Redis
+- Cloudflare R2
+- Gemini
 
-## 1. Prepare Env
+This split is intentional. App containers are cheap and local. Data, queue state, files, and model calls live in managed systems where they belong.
+
+## 1. Prepare Environment
 
 From repo root:
 
@@ -37,41 +41,44 @@ CLOUDFLARE_R2_BUCKET=
 GEMINI_API_KEY=
 ```
 
-For Upstash `rediss://` Celery URLs, include the SSL query string:
-
-```env
-CELERY_BROKER_URL=rediss://default:TOKEN@HOST:PORT/0?ssl_cert_reqs=CERT_REQUIRED
-CELERY_RESULT_BACKEND=rediss://default:TOKEN@HOST:PORT/0?ssl_cert_reqs=CERT_REQUIRED
-```
-
 Do not commit `.env`.
 
-## 2. Recommended Local Mode
+Why: `.env` contains secrets. The repo keeps only `.env.example` so configuration shape is documented without exposing credentials.
 
-Keep these values for smooth local demos:
+## 2. Required Local Defaults
+
+Use these values unless intentionally testing heavy local ML:
 
 ```env
+APP_ENV=local-managed
 INSTALL_ML_DEPS=false
 GENERATION_PROVIDER=gemini
 EMBEDDING_PROVIDER=gemini
 EVALUATION_PROVIDER=local
 RERANKER_PROVIDER=local
 DOCUMENT_STORAGE_PROVIDER=r2
+VITE_API_BASE_URL=http://localhost:8000
 ```
 
-Why: Gemini generation and embeddings still use real managed AI, while local eval and reranking avoid heavy PyTorch/RAGAS dependencies that make laptop Docker builds slow and large.
+Why:
 
-## 3. Full ML Optional
+- Gemini generation gives real answer behavior.
+- Gemini embeddings give real semantic retrieval.
+- Local eval keeps eval fast and deterministic.
+- Local reranker avoids heavy cross-encoder dependencies.
+- R2 keeps original source files outside containers.
+- Vite frontend talks to local FastAPI.
 
-Use this only when you specifically want RAGAS and cross-encoder reranking locally:
+## 3. Upstash URL Detail
+
+For Upstash `rediss://` Celery URLs, include SSL query string:
 
 ```env
-INSTALL_ML_DEPS=true
-EVALUATION_PROVIDER=ragas
-RERANKER_PROVIDER=cross-encoder
+CELERY_BROKER_URL=rediss://default:TOKEN@HOST:PORT/0?ssl_cert_reqs=CERT_REQUIRED
+CELERY_RESULT_BACKEND=rediss://default:TOKEN@HOST:PORT/0?ssl_cert_reqs=CERT_REQUIRED
 ```
 
-Why: this installs `ragas`, `sentence-transformers`, and `torch`. On Apple Silicon Docker/Linux, this can pull very large ML wheels and take several minutes or more.
+Why: Celery uses Redis transport and needs TLS certificate behavior in the URL. Normal `REDIS_URL` ping can work while Celery still fails if this query string is missing.
 
 ## 4. Initialize Neon Schema
 
@@ -82,7 +89,13 @@ docker compose -f docker-compose.managed-local.yml run --rm api \
   python -m app.db_cli ensure-schema --env-file .env
 ```
 
-Why: Neon stores documents, chunks, and pgvector embeddings. Schema must exist before ingestion.
+Expected result:
+
+```text
+schema ready
+```
+
+Why: Neon must have pgvector extension, document tables, chunk tables, and vector index before ingestion is trusted.
 
 ## 5. Start Local Stack
 
@@ -90,27 +103,66 @@ Why: Neon stores documents, chunks, and pgvector embeddings. Schema must exist b
 docker compose -f docker-compose.managed-local.yml up --build
 ```
 
+What starts:
+
+- `api`: FastAPI backend with reload
+- `worker`: Celery worker
+- `frontend`: Vite dev server
+
 Open:
 
 ```text
 http://localhost:5173
 ```
 
-Backend checks:
+Why `--build`: it makes Docker rebuild when dependencies or Dockerfiles changed.
+
+## 6. Verify Backend
+
+Health:
 
 ```bash
 curl http://localhost:8000/health
+```
+
+Meaning:
+
+- API process is alive.
+- FastAPI app loaded.
+- This does not prove database or Redis connectivity.
+
+Readiness:
+
+```bash
 curl http://localhost:8000/ready
 ```
 
-Expected:
+Meaning:
 
-```text
-/health = app process is up
-/ready = backend can reach Neon and Upstash
+- API can connect to Neon.
+- API can ping Upstash Redis.
+- This is the stronger local demo check.
+
+## 7. Run Smoke Test
+
+With stack running:
+
+```bash
+scripts/smoke-local-managed.sh
 ```
 
-## 6. Demo Flow
+What it checks:
+
+1. `/health`
+2. `/ready`
+3. text ingestion
+4. scoped retrieval
+5. cited answer generation
+6. eval endpoint
+
+Why: this validates the full RAG loop from API to DB/cache/model/eval path.
+
+## 8. Browser Demo Flow
 
 1. Open frontend.
 2. Confirm API URL field says:
@@ -120,21 +172,48 @@ http://localhost:8000
 ```
 
 3. Upload `.txt`, `.md`, `.markdown`, or searchable `.pdf`.
-4. Keep `Async` on to show Celery worker.
-5. Ask document questions.
-6. Open eval dashboard and run default eval cases.
+4. Turn `Async` on to show Celery worker path.
+5. Click `Ingest`.
+6. Wait for indexed document and chunk counts.
+7. Ask a factual question from the document.
+8. Inspect answer citations.
+9. Inspect source snippets and scores.
+10. Select one document in corpus list.
+11. Ask again to show scoped retrieval.
+12. Open eval dashboard.
+13. Run default eval cases.
 
-## 7. Stop Stack
+Why this order:
+
+- corpus first, because RAG needs evidence
+- ask second, because it proves user workflow
+- source inspection third, because it proves grounding
+- eval last, because it proves measurement
+
+## 9. Stop Stack
 
 ```bash
 docker compose -f docker-compose.managed-local.yml down
 ```
 
-Why: this stops laptop containers but keeps Neon, Upstash, R2, and Gemini credentials/data intact.
+What stops:
 
-## 8. Clean Local Containers
+- API container
+- worker container
+- frontend container
 
-Use only if Docker gets stale:
+What remains:
+
+- Neon data
+- Upstash cache/task state
+- R2 source files
+- Gemini key in local `.env`
+
+Why: stopping local containers should not destroy managed data.
+
+## 10. Clean Stale Containers
+
+Use only if Docker state gets stale:
 
 ```bash
 docker compose -f docker-compose.managed-local.yml down --remove-orphans
@@ -142,8 +221,96 @@ docker compose -f docker-compose.managed-local.yml down --remove-orphans
 
 Do not delete Neon/R2 data unless you intentionally want a fresh corpus.
 
+## 11. Common Issues
+
+### Frontend Says Offline
+
+Check:
+
+```bash
+curl http://localhost:8000/health
+```
+
+Likely causes:
+
+- API container not running
+- frontend API URL changed
+- backend crashed on startup due missing env
+
+### Upload Fails
+
+Likely causes:
+
+- unsupported file type
+- scanned PDF has no embedded text
+- R2 credentials wrong
+- Gemini embedding call failed
+- database schema not initialized
+
+### Async Job Never Finishes
+
+Check worker logs:
+
+```bash
+docker compose -f docker-compose.managed-local.yml logs worker
+```
+
+Likely causes:
+
+- Celery cannot connect to Upstash
+- SSL query string missing
+- worker missing env values
+- embedding provider failed
+
+### Retrieval Gives Weak Answer
+
+Check:
+
+- document actually indexed
+- selected document scope
+- source chunks shown in UI
+- query phrasing
+- eval metrics
+
+Why: generation quality depends on retrieved context. If retrieved chunks are weak, answer will be weak.
+
+### Eval Shows Misses
+
+Likely causes:
+
+- expected terms not present in indexed chunk text
+- top-k too low
+- wrong document scope selected
+- document content not related to default eval cases
+
+Fix:
+
+- edit `Cases JSON` for current document
+- select correct document
+- compare `top-1`, `top-3`, `top-5`
+
+## 12. Optional Heavy ML Mode
+
+Use only when specifically needed:
+
+```env
+INSTALL_ML_DEPS=true
+EVALUATION_PROVIDER=ragas
+RERANKER_PROVIDER=cross-encoder
+```
+
+Then rebuild:
+
+```bash
+docker compose -f docker-compose.managed-local.yml build api worker
+```
+
+Why this is off by default: `ragas`, `sentence-transformers`, and `torch` can make Docker builds slow and large, especially on Apple Silicon.
+
 ## Explanation
 
-I chose local-only runtime because this project is a technical RAG workbench, not an always-on customer product. There are no active users requiring public uptime, so continuously running paid cloud instances would add cost without improving the core system. The application processes remain containerized, so the runtime is reproducible: API, worker, and frontend run through Docker Compose. I kept Neon, Upstash, R2, and Gemini as managed services because they are the important boundaries: persistent vector database, Redis queue/cache, durable source storage, and model providers.
+I chose local-only runtime because this project is a technical RAG workbench, not an always-on customer product. There are no active users requiring public uptime, so continuously running paid cloud instances would add cost without improving the core system.
+
+The application processes remain containerized, so the runtime is reproducible. Neon, Upstash, R2, and Gemini stay managed because they are core boundaries: persistent vector database, Redis queue/cache, durable source storage, and model providers.
 
 `/ready` is the key health check for this mode because it proves the local backend can reach managed dependencies.

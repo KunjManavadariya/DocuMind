@@ -127,6 +127,16 @@ Use this only when you intentionally want RAGAS and cross-encoder reranking loca
 11. Open `Eval`.
 12. Run default eval cases or edit `Cases JSON`.
 
+## Documentation
+
+Detailed project docs live in `docs/`:
+
+- `docs/system-design.md`: architecture, data flow, design choices, failure modes.
+- `docs/managed-services.md`: Neon, Upstash, R2, Gemini, and local provider choices.
+- `docs/local-managed-runbook.md`: setup, start, verify, demo, stop, debug.
+- `docs/demo-checklist.md`: step-by-step technical walkthrough script.
+- `docs/code-map.md`: feature-to-file map for frontend, backend, providers, and tests.
+
 ## API Flow
 
 Ingest text:
