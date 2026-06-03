@@ -50,18 +50,6 @@ class CorpusClearResponse(BaseModel):
     chunks_deleted: int
 
 
-class ReleaseReadinessCheck(BaseModel):
-    name: str
-    status: str
-    message: str
-
-
-class ReleaseReadinessResponse(BaseModel):
-    deployable: bool
-    environment: str
-    checks: list[ReleaseReadinessCheck]
-
-
 class RetrieveRequest(BaseModel):
     question: str = Field(min_length=1)
     top_k: int = Field(default=5, ge=1, le=20)

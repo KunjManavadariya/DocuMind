@@ -329,7 +329,7 @@ function App() {
             <input
               value={apiBaseInput}
               onChange={(event) => setApiBaseInput(event.target.value)}
-              placeholder="https://documind-api.onrender.com"
+              placeholder="http://localhost:8000"
               spellCheck="false"
             />
             <button type="submit">Save</button>

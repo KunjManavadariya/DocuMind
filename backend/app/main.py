@@ -12,7 +12,6 @@ from app.embeddings import CachedEmbeddingProvider, create_embedding_provider
 from app.evaluation import evaluate_configs
 from app.generation import create_answer_generator
 from app.ingestion import IngestionInput, ingest_document
-from app.release import evaluate_release_readiness, is_deployable
 from app.reranking import create_reranker
 from app.schemas import (
     AnswerRequest,
@@ -30,8 +29,6 @@ from app.schemas import (
     RetrieveRequest,
     RetrieveResponse,
     RetrievedChunk,
-    ReleaseReadinessCheck,
-    ReleaseReadinessResponse,
 )
 from app.worker import celery_app, ingest_text_task
 from app.storage import create_document_storage
@@ -83,23 +80,6 @@ def ready() -> dict[str, str]:
         "database": "ok",
         "redis": "ok",
     }
-
-
-@app.get("/release/readiness", response_model=ReleaseReadinessResponse)
-def release_readiness() -> ReleaseReadinessResponse:
-    checks = evaluate_release_readiness(settings)
-    return ReleaseReadinessResponse(
-        deployable=is_deployable(checks),
-        environment=settings.app_env,
-        checks=[
-            ReleaseReadinessCheck(
-                name=check.name,
-                status=check.status,
-                message=check.message,
-            )
-            for check in checks
-        ],
-    )
 
 
 @app.get("/documents", response_model=DocumentListResponse)
