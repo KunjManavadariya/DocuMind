@@ -82,4 +82,4 @@ Why: local demos stay fast and reliable. Heavy RAGAS/cross-encoder mode remains 
 
 ## Explanation
 
-I kept app processes local and managed services external. That gives a realistic RAG architecture without public hosting: Neon owns vector persistence, Upstash owns cache and queue state, R2 owns source document durability, and Gemini owns model calls.
+I kept app processes local and managed services external. DocuMind is a technical RAG workbench, not an always-on customer product, so public hosting is not required until there are real users or a public availability requirement. Neon owns vector persistence, Upstash owns cache and queue state, R2 owns source document durability, and Gemini owns model calls.

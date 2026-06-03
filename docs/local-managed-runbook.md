@@ -144,6 +144,6 @@ Do not delete Neon/R2 data unless you intentionally want a fresh corpus.
 
 ## Explanation
 
-I chose local-only runtime because the goal is reliable demonstration without paying for always-on hosting. The application processes remain containerized, so the runtime is reproducible: API, worker, and frontend run through Docker Compose. I kept Neon, Upstash, R2, and Gemini as managed services because they are the important boundaries: persistent vector database, Redis queue/cache, durable source storage, and model providers.
+I chose local-only runtime because this project is a technical RAG workbench, not an always-on customer product. There are no active users requiring public uptime, so continuously running paid cloud instances would add cost without improving the core system. The application processes remain containerized, so the runtime is reproducible: API, worker, and frontend run through Docker Compose. I kept Neon, Upstash, R2, and Gemini as managed services because they are the important boundaries: persistent vector database, Redis queue/cache, durable source storage, and model providers.
 
 `/ready` is the key health check for this mode because it proves the local backend can reach managed dependencies.

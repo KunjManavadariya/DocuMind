@@ -230,7 +230,7 @@ curl -X POST http://localhost:8000/eval/run \
 
 DocuMind is not only a chatbot. It is a complete local RAG workbench: ingestion, chunking, embeddings, pgvector retrieval, reranking, grounded generation, citations, caching, async jobs, document scoping, and eval.
 
-The app processes run locally because the final goal is reliable demo without always-on hosting cost. Managed services stay because they are the important production-shaped boundaries: Neon for vector persistence, Upstash for queue/cache, R2 for durable source files, and Gemini for model calls.
+The app processes run locally because this project is a technical RAG workbench, not an always-on customer product. There are no active users requiring public uptime, so running paid cloud instances continuously would add cost without improving the core system. Managed services stay because they are the important architecture boundaries: Neon for vector persistence, Upstash for queue/cache, R2 for durable source files, and Gemini for model calls.
 
 `/health` proves FastAPI is alive. `/ready` proves the backend can reach Neon and Upstash.
 

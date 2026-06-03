@@ -41,7 +41,7 @@ Architecture:
 
 Why local-only:
 
-> I chose local-only runtime because the demo does not need always-on public uptime. This avoids idle hosting cost while keeping the real system boundaries: database, queue/cache, object storage, and model provider.
+> I chose local-only runtime because DocuMind is a technical RAG workbench, not an always-on customer product. There are no active users requiring public uptime, so paid always-on hosting would add cost without improving the core system.
 
 Why Docker:
 
