@@ -37,34 +37,41 @@ CLOUDFLARE_R2_BUCKET=
 GEMINI_API_KEY=
 ```
 
-Do not commit `.env`.
-
-## 2. Recommended Full Local Mode
-
-Keep these values for full local feature mode:
+For Upstash `rediss://` Celery URLs, include the SSL query string:
 
 ```env
-INSTALL_ML_DEPS=true
-GENERATION_PROVIDER=gemini
-EMBEDDING_PROVIDER=gemini
-EVALUATION_PROVIDER=ragas
-RERANKER_PROVIDER=cross-encoder
-DOCUMENT_STORAGE_PROVIDER=r2
+CELERY_BROKER_URL=rediss://default:TOKEN@HOST:PORT/0?ssl_cert_reqs=CERT_REQUIRED
+CELERY_RESULT_BACKEND=rediss://default:TOKEN@HOST:PORT/0?ssl_cert_reqs=CERT_REQUIRED
 ```
 
-Why: this keeps the demo closest to production architecture while still running all app processes locally.
+Do not commit `.env`.
 
-## 3. Lean Fallback
+## 2. Recommended Local Mode
 
-If Docker build is too slow or memory-heavy, use:
+Keep these values for smooth local demos:
 
 ```env
 INSTALL_ML_DEPS=false
+GENERATION_PROVIDER=gemini
+EMBEDDING_PROVIDER=gemini
 EVALUATION_PROVIDER=local
 RERANKER_PROVIDER=local
+DOCUMENT_STORAGE_PROVIDER=r2
 ```
 
-Why: Gemini generation and embeddings still work, but RAGAS and cross-encoder are skipped.
+Why: Gemini generation and embeddings still use real managed AI, while local eval and reranking avoid heavy PyTorch/RAGAS dependencies that make laptop Docker builds slow and large.
+
+## 3. Full ML Optional
+
+Use this only when you specifically want RAGAS and cross-encoder reranking locally:
+
+```env
+INSTALL_ML_DEPS=true
+EVALUATION_PROVIDER=ragas
+RERANKER_PROVIDER=cross-encoder
+```
+
+Why: this installs `ragas`, `sentence-transformers`, and `torch`. On Apple Silicon Docker/Linux, this can pull very large ML wheels and take several minutes or more.
 
 ## 4. Initialize Neon Schema
 
