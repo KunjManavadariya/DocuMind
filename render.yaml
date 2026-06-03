@@ -2,7 +2,7 @@ services:
   - type: web
     name: documind-api
     runtime: docker
-    plan: free
+    plan: hobby
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     dockerCommand: sh -c "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-10000}"
@@ -69,7 +69,7 @@ services:
   - type: web
     name: documind-web
     runtime: static
-    plan: free
+    plan: hobby
     buildCommand: cd frontend && npm ci && npm run build
     staticPublishPath: ./frontend/dist
     autoDeployTrigger: commit
@@ -80,7 +80,7 @@ services:
   - type: worker
     name: documind-worker
     runtime: docker
-    plan: free
+    plan: hobby
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     dockerCommand: celery -A app.worker.celery_app worker --loglevel=info
