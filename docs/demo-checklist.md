@@ -1,6 +1,6 @@
 # Demo Checklist
 
-Use this before an interviewer or portfolio walkthrough.
+Use this before a demo or technical walkthrough.
 
 ## Start
 
@@ -45,7 +45,7 @@ Why local-only:
 
 Why Docker:
 
-> Docker keeps local runs reproducible. The interviewer does not need my laptop's Python or Node environment; the app containers define the runtime.
+> Docker keeps local runs reproducible. The demo does not depend on my laptop's Python or Node environment; the app containers define the runtime.
 
 Why Neon and pgvector:
 

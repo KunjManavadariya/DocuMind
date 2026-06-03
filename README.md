@@ -226,7 +226,7 @@ curl -X POST http://localhost:8000/eval/run \
   }'
 ```
 
-## Interview Explanation
+## Explanation
 
 DocuMind is not only a chatbot. It is a complete local RAG workbench: ingestion, chunking, embeddings, pgvector retrieval, reranking, grounded generation, citations, caching, async jobs, document scoping, and eval.
 

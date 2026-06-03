@@ -80,6 +80,6 @@ RERANKER_PROVIDER=local
 
 Why: local demos stay fast and reliable. Heavy RAGAS/cross-encoder mode remains available when intentionally enabled.
 
-## Interview Explanation
+## Explanation
 
 I kept app processes local and managed services external. That gives a realistic RAG architecture without public hosting: Neon owns vector persistence, Upstash owns cache and queue state, R2 owns source document durability, and Gemini owns model calls.

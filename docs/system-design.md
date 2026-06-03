@@ -35,6 +35,6 @@ FastAPI stays stateless. Celery isolates slow ingestion from request handling. N
 
 Eval runs use same retrieval and answer path as user questions. Each case has a question plus expected terms or source. Dashboard compares `top-1`, `top-3`, and `top-5` using recall, MRR, context precision, faithfulness, and answer relevance.
 
-## Interview Explanation
+## Explanation
 
 DocuMind is not a prompt demo. It is a small RAG system with visible ingestion, retrieval, generation, cache, async worker, corpus scoping, and eval loops. Local runtime keeps demo cost low, while managed backing services preserve real architecture boundaries.
