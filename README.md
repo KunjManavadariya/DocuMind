@@ -54,6 +54,14 @@ Then open:
 
 This mode runs the backend, worker, and frontend on your laptop while using Neon, Upstash, Cloudflare R2, and Gemini from `.env`. See `docs/local-managed-runbook.md`.
 
+Run the local managed smoke test:
+
+```bash
+scripts/smoke-local-managed.sh
+```
+
+Use `docs/demo-checklist.md` before a walkthrough.
+
 Fully offline/local Docker defaults are still available:
 
 ```bash
@@ -82,6 +90,8 @@ Environment and hosting references:
 - `.env.managed-local.example`
 - `docker-compose.managed-local.yml`
 - `docs/local-managed-runbook.md`
+- `docs/demo-checklist.md`
+- `scripts/smoke-local-managed.sh`
 - optional public-hosting references:
 - `.env.production.example`
 - `render.yaml`
