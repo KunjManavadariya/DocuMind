@@ -37,11 +37,11 @@ http://localhost:5173
 
 Architecture:
 
-> DocuMind runs app processes locally in Docker: FastAPI API, React frontend, and Celery worker. It still uses production-like managed services: Neon for Postgres plus pgvector, Upstash Redis for cache and Celery broker/results, Cloudflare R2 for durable source files, and Gemini for generation and embeddings.
+> DocuMind runs app processes locally in Docker: FastAPI API, React frontend, and Celery worker. It uses managed services for real backing systems: Neon for Postgres plus pgvector, Upstash Redis for cache and Celery broker/results, Cloudflare R2 for durable source files, and Gemini for generation and embeddings.
 
 Why local-only:
 
-> I chose local-only hosting because the demo does not need always-on public uptime. This avoids idle hosting cost while keeping the real system boundaries: database, queue/cache, object storage, and model provider.
+> I chose local-only runtime because the demo does not need always-on public uptime. This avoids idle hosting cost while keeping the real system boundaries: database, queue/cache, object storage, and model provider.
 
 Why Docker:
 
@@ -69,7 +69,7 @@ Why local eval/rerank by default:
 
 Health checks:
 
-> `/health` proves the API process is alive. `/ready` proves the API can reach Neon and Upstash. `/release/readiness` is intentionally false in local-only mode because public production deployment is not the chosen release path.
+> `/health` proves the API process is alive. `/ready` proves the API can reach Neon and Upstash.
 
 ## Stop
 

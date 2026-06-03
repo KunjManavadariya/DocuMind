@@ -1,4 +1,4 @@
-# Optional production ML/evaluation dependencies.
+# Optional heavyweight local ML/evaluation dependencies.
 # Install only when RERANKER_PROVIDER=cross-encoder or EVALUATION_PROVIDER=ragas.
 ragas==0.4.3
 sentence-transformers==5.4.1

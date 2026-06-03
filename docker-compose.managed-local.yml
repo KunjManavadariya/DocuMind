@@ -3,7 +3,7 @@ services:
     build:
       context: ./backend
       args:
-        INSTALL_ML_DEPS: ${INSTALL_ML_DEPS:-true}
+        INSTALL_ML_DEPS: ${INSTALL_ML_DEPS:-false}
     env_file:
       - .env
     ports:
@@ -28,7 +28,7 @@ services:
     build:
       context: ./backend
       args:
-        INSTALL_ML_DEPS: ${INSTALL_ML_DEPS:-true}
+        INSTALL_ML_DEPS: ${INSTALL_ML_DEPS:-false}
     env_file:
       - .env
     volumes:

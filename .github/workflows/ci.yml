@@ -37,7 +37,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate local compose
-        run: docker compose config
-      - name: Validate production compose
-        run: docker compose -f docker-compose.prod.yml config
+      - name: Validate managed local compose
+        run: docker compose -f docker-compose.managed-local.yml config

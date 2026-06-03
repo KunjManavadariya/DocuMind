@@ -8,19 +8,19 @@ Nothing is deployed to a public host. Your laptop runs:
 - Celery worker
 - React frontend
 
-Managed services still provide production-like backing systems:
+Managed services provide real backing systems:
 
 - Neon Postgres with pgvector
 - Upstash Redis for cache, Celery broker, and result backend
 - Cloudflare R2 for source document storage
-- Gemini for generation, embeddings, and RAGAS evaluation
+- Gemini for generation and embeddings
 
 ## 1. Prepare Env
 
 From repo root:
 
 ```bash
-cp .env.managed-local.example .env
+cp .env.example .env
 ```
 
 Fill real values in `.env` only:
@@ -144,6 +144,6 @@ Do not delete Neon/R2 data unless you intentionally want a fresh corpus.
 
 ## Interview Explanation
 
-I chose local-only deployment because the goal is reliable demonstration without paying for always-on hosting. The application processes remain containerized, so the runtime is still reproducible: API, worker, and frontend run through Docker Compose. I kept Neon, Upstash, R2, and Gemini as managed services because they are the important production boundaries: persistent vector database, Redis queue/cache, durable source storage, and model providers. This gives a production-shaped architecture without public hosting cost.
+I chose local-only runtime because the goal is reliable demonstration without paying for always-on hosting. The application processes remain containerized, so the runtime is reproducible: API, worker, and frontend run through Docker Compose. I kept Neon, Upstash, R2, and Gemini as managed services because they are the important boundaries: persistent vector database, Redis queue/cache, durable source storage, and model providers.
 
-`/ready` is the key health check for this mode because it proves the local backend can reach managed dependencies. `/release/readiness` may remain false because this is not a public production release: localhost CORS and local-only process hosting are intentional.
+`/ready` is the key health check for this mode because it proves the local backend can reach managed dependencies.
