@@ -34,12 +34,6 @@ services:
     volumes:
       - ./backend:/app
     command: celery -A app.worker.celery_app worker --loglevel=info
-    healthcheck:
-      test: ["CMD-SHELL", "celery -A app.worker.celery_app inspect ping --timeout=5 >/dev/null"]
-      interval: 60s
-      timeout: 15s
-      retries: 5
-      start_period: 45s
 
   frontend:
     build:
