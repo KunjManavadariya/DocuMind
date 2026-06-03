@@ -38,6 +38,24 @@ Foundation plus first retrieval core:
 
 ## Local Development
 
+Primary local-only demo with managed services:
+
+```bash
+cp .env.managed-local.example .env
+docker compose -f docker-compose.managed-local.yml run --rm api python -m app.db_cli ensure-schema --env-file .env
+docker compose -f docker-compose.managed-local.yml up --build
+```
+
+Then open:
+
+- Frontend: http://localhost:5173
+- Backend health: http://localhost:8000/health
+- Backend readiness: http://localhost:8000/ready
+
+This mode runs the backend, worker, and frontend on your laptop while using Neon, Upstash, Cloudflare R2, and Gemini from `.env`. See `docs/local-managed-runbook.md`.
+
+Fully offline/local Docker defaults are still available:
+
 ```bash
 cp .env.example .env
 docker compose up --build
@@ -59,8 +77,12 @@ Then open:
 
 The frontend supports document upload, async ingestion polling, indexed corpus inspection, corpus clearing, cited answers, source inspection, recent answer history, and retrieval plus answer-quality eval comparison.
 
-Production env template:
+Environment and hosting references:
 
+- `.env.managed-local.example`
+- `docker-compose.managed-local.yml`
+- `docs/local-managed-runbook.md`
+- optional public-hosting references:
 - `.env.production.example`
 - `render.yaml`
 - `docs/render-deployment.md`
