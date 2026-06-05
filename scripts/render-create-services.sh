@@ -7,7 +7,7 @@ RENDER_BIN="${RENDER_BIN:-/opt/homebrew/bin/render}"
 REPO_URL="${REPO_URL:-https://github.com/KunjManavadariya/DocuMind}"
 BRANCH="${BRANCH:-main}"
 API_NAME="${API_NAME:-documind-api-kunj}"
-WEB_NAME="${WEB_NAME:-documind-web-kunj}"
+WEB_NAME="${WEB_NAME:-documind-static-kunj}"
 API_URL="https://${API_NAME}.onrender.com"
 
 if [[ ! -f "${ENV_FILE}" ]]; then
@@ -88,12 +88,12 @@ done
 
 "${RENDER_BIN}" services create \
   --name "${WEB_NAME}" \
-  --type web_service \
+  --type static_site \
   --repo "${REPO_URL}" \
   --branch "${BRANCH}" \
-  --runtime docker \
   --root-directory frontend \
-  --plan free \
+  --build-command "npm ci && npm run build" \
+  --publish-directory dist \
   --env-var VITE_API_BASE_URL="${API_URL}" \
   --confirm
 

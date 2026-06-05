@@ -10,7 +10,7 @@ DocuMind is a documentation RAG workbench. Primary mode is local-first: app proc
 - Cloudflare R2 for original uploaded or fetched source files
 - Gemini for generation and embeddings
 
-Optional public demo mode runs the React frontend and FastAPI backend on Render free web services through Docker. The Celery worker remains local for async ingestion demos.
+Optional public demo mode runs the React frontend as a Render Static Site and the FastAPI backend as a Render Docker web service. The Celery worker remains local for async ingestion demos.
 
 ## What It Does
 
@@ -116,9 +116,9 @@ Use this only when you intentionally want RAGAS and cross-encoder reranking loca
 
 Render demo mode is meant for short portfolio demos, not always-on production uptime.
 
-- Frontend URL: `https://documind-web-kunj.onrender.com`
+- Frontend URL: `https://documind-static-kunj.onrender.com`
 - Backend URL: `https://documind-api-kunj.onrender.com`
-- Frontend: Render Docker web service from `frontend/Dockerfile`.
+- Frontend: Render Static Site from `frontend/`.
 - Backend: Render Docker web service from `backend/Dockerfile`.
 - Database/vector store: Neon Postgres with pgvector.
 - Cache/broker: Upstash Redis.
@@ -140,7 +140,7 @@ Deploy helper:
 scripts/render-create-services.sh
 ```
 
-The helper reads local `.env`, creates two Render Docker web services, and does not print secret values.
+The helper reads local `.env`, creates the backend Docker web service and frontend Static Site, and does not print secret values.
 
 ## Manual Browser Flow
 
