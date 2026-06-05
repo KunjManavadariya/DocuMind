@@ -116,8 +116,8 @@ Use this only when you intentionally want RAGAS and cross-encoder reranking loca
 
 Render demo mode is meant for short portfolio demos, not always-on production uptime.
 
-- Frontend URL: `https://documind-static-kunj.onrender.com`
-- Backend URL: `https://documind-api-kunj.onrender.com`
+- Frontend URL: `https://documind-rag-workbench.onrender.com`
+- Backend URL: `https://documind-rag-api.onrender.com`
 - Frontend: Render Static Site from `frontend/`.
 - Backend: Render Docker web service from `backend/Dockerfile`.
 - Database/vector store: Neon Postgres with pgvector.

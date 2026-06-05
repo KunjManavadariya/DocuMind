@@ -6,8 +6,8 @@ ENV_FILE="${ROOT_DIR}/.env"
 RENDER_BIN="${RENDER_BIN:-/opt/homebrew/bin/render}"
 REPO_URL="${REPO_URL:-https://github.com/KunjManavadariya/DocuMind}"
 BRANCH="${BRANCH:-main}"
-API_NAME="${API_NAME:-documind-api-kunj}"
-WEB_NAME="${WEB_NAME:-documind-static-kunj}"
+API_NAME="${API_NAME:-documind-rag-api}"
+WEB_NAME="${WEB_NAME:-documind-rag-workbench}"
 API_URL="https://${API_NAME}.onrender.com"
 
 if [[ ! -f "${ENV_FILE}" ]]; then
