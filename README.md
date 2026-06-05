@@ -1,6 +1,6 @@
 # DocuMind
 
-DocuMind is a local-first documentation RAG workbench. It runs the app processes on your laptop while using managed backing services for the real system boundaries:
+DocuMind is a documentation RAG workbench. Primary mode is local-first: app processes run on your laptop while managed backing services provide the real system boundaries:
 
 - React frontend on `http://localhost:5173`
 - FastAPI backend on `http://localhost:8000`
@@ -10,7 +10,7 @@ DocuMind is a local-first documentation RAG workbench. It runs the app processes
 - Cloudflare R2 for original uploaded or fetched source files
 - Gemini for generation and embeddings
 
-Nothing in this repo is configured for public hosting. Final project mode is local demo mode.
+Optional public demo mode runs the React frontend and FastAPI backend on Render free web services through Docker. The Celery worker remains local for async ingestion demos.
 
 ## What It Does
 
@@ -111,6 +111,34 @@ RERANKER_PROVIDER=cross-encoder
 ```
 
 Use this only when you intentionally want RAGAS and cross-encoder reranking locally.
+
+## Optional Render Demo
+
+Render demo mode is meant for short portfolio demos, not always-on production uptime.
+
+- Frontend: Render Docker web service from `frontend/Dockerfile`.
+- Backend: Render Docker web service from `backend/Dockerfile`.
+- Database/vector store: Neon Postgres with pgvector.
+- Cache/broker: Upstash Redis.
+- Source file storage: Cloudflare R2.
+- LLM/embeddings: Gemini.
+- Async worker: still local. Sync upload, URL ingestion, retrieval, answer generation, and eval can run through hosted frontend/backend. Async ingestion needs local worker connected to same Upstash/Neon/R2/Gemini env.
+
+Render env needs same managed-service values as `.env`, plus:
+
+```env
+APP_ENV=render-free
+CORS_ORIGIN_REGEX=https://.*\.onrender\.com
+VITE_API_BASE_URL=https://YOUR_BACKEND_SERVICE.onrender.com
+```
+
+Deploy helper:
+
+```bash
+scripts/render-create-services.sh
+```
+
+The helper reads local `.env`, creates two Render Docker web services, and does not print secret values.
 
 ## Manual Browser Flow
 

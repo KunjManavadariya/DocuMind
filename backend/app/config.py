@@ -7,6 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     app_env: str = "local"
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+    cors_origin_regex: str | None = None
 
     database_url: str = "postgresql://documind:documind@localhost:5432/documind"
     redis_url: str = "redis://localhost:6379/0"
