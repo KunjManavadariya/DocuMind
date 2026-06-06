@@ -1,6 +1,6 @@
 # DocuMind System Design
 
-DocuMind is a local-first documentation RAG workbench. Its app processes run on the laptop through Docker Compose, while persistence and model calls use managed services. That gives the project real RAG boundaries without requiring an always-on public deployment.
+DocuMind is a documentation RAG workbench with two runtime modes. In local managed mode, the app processes run on the laptop through Docker Compose while persistence and model calls use managed services. In hosted demo mode, the frontend runs as a Render Static Site and the backend runs as a Render Docker Web Service. The Celery worker remains local when async ingestion is demonstrated.
 
 ## Goals
 
@@ -16,13 +16,13 @@ DocuMind is built to prove the complete RAG loop:
 8. Show retrieved sources for inspection.
 9. Evaluate retrieval and answer quality.
 
-The goal is not public uptime. There are no active users requiring a hosted service, so paid always-on compute would increase cost without improving the core system.
+The goal is a complete, inspectable RAG system rather than a full commercial SaaS platform. Public demo access exists for frontend/backend, but there are no active users requiring always-on worker capacity or paid production scaling.
 
 ## Runtime Components
 
 ### React Frontend
 
-Runs at `http://localhost:5173`.
+Runs locally at `http://localhost:5173` and publicly at `https://documind-rag-workbench.onrender.com`.
 
 Responsibilities:
 
@@ -40,10 +40,11 @@ Why React:
 - fast to build a single-page workbench
 - stateful UI fits upload status, selected corpus scope, recent answers, and eval state
 - Vite development server gives quick local iteration
+- Vite production build works cleanly as a Render Static Site
 
 ### FastAPI Backend
 
-Runs at `http://localhost:8000`.
+Runs locally at `http://localhost:8000` and publicly at `https://documind-rag-api.onrender.com`.
 
 Responsibilities:
 
@@ -62,6 +63,7 @@ Why FastAPI:
 - automatic request validation through Pydantic
 - good async/file-upload support
 - easy local Docker runtime
+- easy hosted Docker runtime on Render
 
 ### Celery Worker
 
@@ -78,6 +80,12 @@ Why Celery:
 - ingestion can become slow because embedding calls are external model calls
 - background work should not block API request threads
 - Redis broker/result backend is enough for this project shape
+
+Why worker is not hosted in current Render demo:
+
+- sync ingestion covers hosted upload/retrieval/answer/eval demo
+- async ingestion is demonstrable by running local worker against same Upstash broker
+- no active user workload requires always-on background compute
 
 ### Neon Postgres With pgvector
 
@@ -291,19 +299,20 @@ Why:
 - heavier optional providers can be enabled without changing API route code
 - each dependency has one interface and one responsibility
 
-## Local-Only Hosting Rationale
+## Hosting Rationale
 
-DocuMind is intentionally not deployed to public cloud as an always-on service. The current project has no real user traffic or uptime requirement. Paying for always-running API, worker, and frontend compute would demonstrate hosting, but it would not improve ingestion, retrieval, generation, or evaluation quality.
+DocuMind now has public frontend/backend demo hosting, but it is still designed as a technical RAG workbench rather than an always-on commercial product. Frontend is static because React builds to files. Backend is Docker-hosted because FastAPI needs a Python runtime. Worker remains local because async jobs do not need always-on hosted compute for the current demo.
 
-Instead, the project keeps the parts that matter for RAG architecture:
+The project keeps the parts that matter for RAG architecture:
 
 - real managed database
 - real managed Redis
 - real object storage
 - real model provider
 - reproducible local containers
+- public frontend/backend demo URLs
 
-This keeps cost low while preserving the engineering boundaries that would matter if the project later needed public availability.
+This keeps cost low while preserving the engineering boundaries that would matter if the project later needed full production availability.
 
 ## Failure Modes And Controls
 

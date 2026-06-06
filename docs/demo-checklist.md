@@ -4,6 +4,14 @@ Use this before a demo or technical walkthrough. It is intentionally operational
 
 ## 1. Start
 
+For hosted demo, open:
+
+```text
+https://documind-rag-workbench.onrender.com
+```
+
+For local demo, start Docker:
+
 ```bash
 docker compose -f docker-compose.managed-local.yml up -d
 ```
@@ -140,9 +148,9 @@ Strong explanation:
 
 > DocuMind runs app processes locally in Docker: FastAPI API, React frontend, and Celery worker. It uses managed services for real backing systems: Neon for Postgres plus pgvector, Upstash Redis for cache and Celery broker/results, Cloudflare R2 for durable source files, and Gemini for generation and embeddings.
 
-### Why Local-Only
+### Why Render Plus Local Worker
 
-> DocuMind is a technical RAG workbench, not an always-on customer product. There are no active users requiring public uptime, so paid always-on hosting would add cost without improving the core system.
+> DocuMind hosts the frontend as a Render Static Site and the backend as a Render Docker Web Service. The Celery worker remains local for async demos because there is no always-on background workload. This gives public access for sync RAG workflows while keeping compute cost low.
 
 ### Why Docker
 

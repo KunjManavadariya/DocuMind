@@ -4,7 +4,7 @@ This is the primary operating guide for DocuMind. It explains how to start, veri
 
 ## Runtime Model
 
-Nothing is deployed to a public host. Your laptop runs:
+Local managed mode runs these app processes on your laptop:
 
 - FastAPI backend
 - Celery worker
@@ -18,6 +18,13 @@ Managed services provide real backing systems:
 - Gemini
 
 This split is intentional. App containers are cheap and local. Data, queue state, files, and model calls live in managed systems where they belong.
+
+Hosted demo mode also exists:
+
+- frontend: `https://documind-rag-workbench.onrender.com`
+- backend: `https://documind-rag-api.onrender.com`
+
+Use local managed mode when developing, testing async worker behavior, or explaining every service from scratch.
 
 ## 1. Prepare Environment
 
@@ -309,7 +316,7 @@ Why this is off by default: `ragas`, `sentence-transformers`, and `torch` can ma
 
 ## Explanation
 
-I chose local-only runtime because this project is a technical RAG workbench, not an always-on customer product. There are no active users requiring public uptime, so continuously running paid cloud instances would add cost without improving the core system.
+Local managed runtime remains important even after Render hosting because it is the only mode that runs API, frontend, and Celery worker together. Hosted frontend/backend are for public sync demos. Local mode is for development, async ingestion, debugging, and explaining the complete system.
 
 The application processes remain containerized, so the runtime is reproducible. Neon, Upstash, R2, and Gemini stay managed because they are core boundaries: persistent vector database, Redis queue/cache, durable source storage, and model providers.
 

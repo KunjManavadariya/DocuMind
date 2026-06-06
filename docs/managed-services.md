@@ -1,6 +1,6 @@
 # Managed Local Services
 
-DocuMind runs API, worker, and frontend locally, but depends on managed services for persistence, cache/queue, object storage, and model calls. This document explains what each service does, why it was picked, what values are needed, and how it fits into the whole system.
+DocuMind can run API, worker, and frontend locally, and it also has a hosted Render demo for frontend/backend. Both modes depend on managed services for persistence, cache/queue, object storage, and model calls. This document explains what each service does, why it was picked, what values are needed, and how it fits into the whole system.
 
 ## Service Order
 
@@ -193,12 +193,13 @@ RERANKER_MODEL=cross-encoder/ms-marco-MiniLM-L-6-v2
 
 This installs large dependencies such as `torch`, `sentence-transformers`, and `ragas`. Keep it off unless specifically testing heavy local ML.
 
-## Why Not Run Everything Locally
+## Why Not Run Every Backing Service Locally
 
-Running Postgres, Redis, object storage, and models locally would reduce external dependencies, but it would also make the system less representative of real RAG architecture. DocuMind keeps app processes local but leaves durable services external. This gives a practical balance:
+Running Postgres, Redis, object storage, and models locally would reduce external dependencies, but it would also make the system less representative of real RAG architecture. DocuMind keeps durable backing services external in both local and hosted modes. This gives a practical balance:
 
 - low compute cost
 - reproducible local containers
+- public frontend/backend demo
 - persistent managed data
 - real model behavior
 - no paid always-on app hosting
@@ -245,4 +246,4 @@ Check:
 
 ## Explanation
 
-DocuMind keeps local app runtime and managed service boundaries separate. Local Docker gives control and no always-on hosting cost. Neon, Upstash, R2, and Gemini keep the parts that should not live inside app containers: persistent vectors, queue/cache state, source artifacts, and model intelligence.
+DocuMind keeps app runtime and managed service boundaries separate. Local Docker gives control for development and async worker demos. Render gives a public frontend/backend demo. Neon, Upstash, R2, and Gemini keep the parts that should not live inside app containers: persistent vectors, queue/cache state, source artifacts, and model intelligence.

@@ -50,6 +50,13 @@ Why separate file:
 - UI components stay focused on state and rendering
 - backend paths are centralized
 - error handling is consistent
+- same UI can point to local backend or hosted Render backend
+
+Hosted behavior:
+
+- local dev uses `VITE_API_BASE_URL=http://localhost:8000`
+- Render Static Site build uses `VITE_API_BASE_URL=https://documind-rag-api.onrender.com`
+- user can still override API URL from UI and store it in browser `localStorage`
 
 ### `frontend/src/styles.css`
 
@@ -112,6 +119,25 @@ Why schemas matter:
 - API responses stay predictable
 - frontend knows exact JSON shape
 - invalid payloads fail early
+
+### `backend/app/config.py`
+
+Application settings.
+
+Owns:
+
+- environment name
+- CORS origins and Render origin regex
+- database URL
+- Redis/Celery URLs
+- provider choices
+- Gemini/R2 model and storage settings
+
+Why:
+
+- local Docker and Render use same code with different env values
+- secrets stay out of repo
+- provider choices can change without route rewrites
 
 ## Ingestion
 
@@ -337,6 +363,22 @@ Why:
 
 ## Scripts
 
+### `scripts/render-create-services.sh`
+
+Render setup helper.
+
+Owns:
+
+- backend Docker web service creation
+- frontend Static Site creation
+- transfer of required `.env` values to Render env vars
+
+Why:
+
+- repeatable deployment setup
+- no manual copy-paste of every env var
+- secrets are read locally and not printed
+
 ### `scripts/smoke-local-managed.sh`
 
 End-to-end local smoke test.
@@ -354,3 +396,51 @@ Why:
 
 - unit tests prove modules
 - smoke test proves running stack wiring
+
+## Configuration And Runtime Files
+
+### `.env.example`
+
+Documented environment shape.
+
+Why:
+
+- new users know which values are required
+- secrets never enter Git history
+- local and Render environments share same config names
+
+### `docker-compose.managed-local.yml`
+
+Local runtime definition.
+
+Services:
+
+- `api`
+- `worker`
+- `frontend`
+
+Why:
+
+- local development is reproducible
+- worker can be demonstrated even though hosted worker is not always on
+- managed services stay external
+
+### `backend/Dockerfile`
+
+Hosted and local backend image.
+
+Why:
+
+- Render backend runs through Docker
+- local API and worker also build from same backend context
+- command respects Render `PORT` while keeping local fallback
+
+### `frontend/Dockerfile`
+
+Local frontend development image.
+
+Why:
+
+- Docker Compose local mode can run Vite dev server
+- Render frontend does not use this Dockerfile because it is a Static Site
+- static production build is handled by Render build command

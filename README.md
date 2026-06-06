@@ -161,9 +161,11 @@ The helper reads local `.env`, creates the backend Docker web service and fronte
 
 Detailed project docs live in `docs/`:
 
+- `docs/learning-guide.md`: plain-English guide from zero knowledge to full RAG workflow.
 - `docs/system-design.md`: architecture, data flow, design choices, failure modes.
 - `docs/managed-services.md`: Neon, Upstash, R2, Gemini, and local provider choices.
 - `docs/local-managed-runbook.md`: setup, start, verify, demo, stop, debug.
+- `docs/render-deployment.md`: hosted Render frontend/backend deployment, verification, and tradeoffs.
 - `docs/demo-checklist.md`: step-by-step technical walkthrough script.
 - `docs/code-map.md`: feature-to-file map for frontend, backend, providers, and tests.
 
@@ -268,9 +270,9 @@ curl -X POST http://localhost:8000/eval/run \
 
 ## Explanation
 
-DocuMind is not only a chatbot. It is a complete local RAG workbench: ingestion, chunking, embeddings, pgvector retrieval, reranking, grounded generation, citations, caching, async jobs, document scoping, and eval.
+DocuMind is not only a chatbot. It is a complete RAG workbench: ingestion, chunking, embeddings, pgvector retrieval, reranking, grounded generation, citations, caching, async jobs, document scoping, and eval.
 
-The app processes run locally because this project is a technical RAG workbench, not an always-on customer product. There are no active users requiring public uptime, so running paid cloud instances continuously would add cost without improving the core system. Managed services stay because they are the important architecture boundaries: Neon for vector persistence, Upstash for queue/cache, R2 for durable source files, and Gemini for model calls.
+Primary development mode runs app processes locally. Public demo mode hosts the frontend as a Render Static Site and the backend as a Render Docker Web Service. The Celery worker remains local for async ingestion demos because there is no always-on user workload that justifies hosted worker compute. Managed services stay because they are the important architecture boundaries: Neon for vector persistence, Upstash for queue/cache, R2 for durable source files, and Gemini for model calls.
 
 `/health` proves FastAPI is alive. `/ready` proves the backend can reach Neon and Upstash.
 
@@ -290,4 +292,12 @@ Smoke test with running stack:
 
 ```bash
 scripts/smoke-local-managed.sh
+```
+
+Hosted smoke test:
+
+```bash
+curl https://documind-rag-api.onrender.com/health
+curl https://documind-rag-api.onrender.com/ready
+curl -I https://documind-rag-workbench.onrender.com/
 ```
