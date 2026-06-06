@@ -1,16 +1,23 @@
 # DocuMind
 
-DocuMind is a documentation RAG workbench. Primary mode is local-first: app processes run on your laptop while managed backing services provide the real system boundaries:
+DocuMind is a hosted RAG documentation workbench with a local development mode. It ingests documents, retrieves relevant chunks with pgvector semantic search, generates Gemini-powered citation-backed answers, and includes an eval dashboard for measuring RAG quality.
 
-- React frontend on `http://localhost:5173`
-- FastAPI backend on `http://localhost:8000`
-- Celery worker for async ingestion
-- Neon Postgres with pgvector for documents, chunks, and vector search
-- Upstash Redis for cache, Celery broker, and Celery result backend
-- Cloudflare R2 for original uploaded or fetched source files
-- Gemini for generation and embeddings
+Current public demo:
 
-Optional public demo mode runs the React frontend as a Render Static Site and the FastAPI backend as a Render Docker web service. The Celery worker remains local for async ingestion demos.
+- Frontend: `https://documind-rag-workbench.onrender.com`
+- Backend: `https://documind-rag-api.onrender.com`
+
+Current architecture:
+
+- React frontend deployed as a Render Static Site
+- FastAPI backend deployed as a Render Docker Web Service
+- Celery worker runs locally when async ingestion needs to be demonstrated
+- Neon Postgres with pgvector stores documents, chunks, and embeddings
+- Upstash Redis handles cache, Celery broker, and Celery result backend
+- Cloudflare R2 stores original uploaded or fetched source files
+- Gemini handles generation and embeddings
+
+Local development mode runs the same frontend, backend, and worker on the laptop through Docker Compose while still using the same managed service boundaries.
 
 ## What It Does
 
@@ -27,7 +34,34 @@ Optional public demo mode runs the React frontend as a Render Static Site and th
 - Run eval cases against `top-1`, `top-3`, and `top-5` retrieval configs.
 - Compare recall, MRR, context precision, faithfulness, and answer relevance.
 
-## Quick Start
+## Hosted Demo
+
+Open:
+
+```text
+https://documind-rag-workbench.onrender.com
+```
+
+Use hosted mode for sync workflows:
+
+- upload document
+- ingest URL
+- ask question
+- inspect citations
+- run eval dashboard
+
+Keep `Async` off unless a local Celery worker is running with the same managed-service credentials.
+
+Hosted backend checks:
+
+```bash
+curl https://documind-rag-api.onrender.com/health
+curl https://documind-rag-api.onrender.com/ready
+```
+
+## Local Development
+
+Use local mode when changing code, testing the worker, or explaining the full system from scratch.
 
 From repo root:
 
@@ -112,9 +146,9 @@ RERANKER_PROVIDER=cross-encoder
 
 Use this only when you intentionally want RAGAS and cross-encoder reranking locally.
 
-## Optional Render Demo
+## Render Deployment
 
-Render demo mode is meant for short portfolio demos, not always-on production uptime.
+Render demo mode is already configured for public portfolio access.
 
 - Frontend URL: `https://documind-rag-workbench.onrender.com`
 - Backend URL: `https://documind-rag-api.onrender.com`
@@ -142,7 +176,23 @@ scripts/render-create-services.sh
 
 The helper reads local `.env`, creates the backend Docker web service and frontend Static Site, and does not print secret values.
 
-## Manual Browser Flow
+## Browser Flow
+
+Hosted:
+
+1. Open `https://documind-rag-workbench.onrender.com`.
+2. Confirm API URL is `https://documind-rag-api.onrender.com`.
+3. Keep `Async` off unless local worker is running.
+4. Upload a small document.
+5. Click `Ingest`.
+6. Watch indexed document and chunk counts.
+7. Ask a factual question from the document.
+8. Inspect citations and source chunks.
+9. Select one document to scope retrieval.
+10. Open `Eval`.
+11. Run default eval cases or edit `Cases JSON`.
+
+Local:
 
 1. Start local stack.
 2. Open `http://localhost:5173`.
@@ -170,6 +220,8 @@ Detailed project docs live in `docs/`:
 - `docs/code-map.md`: feature-to-file map for frontend, backend, providers, and tests.
 
 ## API Flow
+
+Use `http://localhost:8000` for local runs or `https://documind-rag-api.onrender.com` for hosted runs.
 
 Ingest text:
 
